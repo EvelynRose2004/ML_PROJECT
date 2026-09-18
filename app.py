@@ -2,66 +2,40 @@ import streamlit as st
 import pandas as pd
 import joblib
 
-from sklearn.preprocessing import PolynomialFeatures
+pipeline = joblib.load("model.pkl")
 
-# Page configuration
-st.set_page_config(
-    page_title="AC Electric Bill Prediction",
-    page_icon="⚡",
-    layout="centered"
+poly = pipeline["poly"]
+model = pipeline["model"]
+
+st.title("Electric Bill Prediction")
+
+st.write(
+    "Predict your electric bill using AC and Fan electricity consumption."
 )
 
-# Load the saved model
-model = joblib.load("model.pkl")
-
-# Create PolynomialFeatures
-poly = PolynomialFeatures(degree=2)
-
-# Application title
-st.title("⚡ AC Electric Bill Prediction")
-
-st.write("Enter the AC Units to predict your electricity bill.")
-
-st.divider()
-
-# Input field
 ac_units = st.number_input(
-    "Enter AC Units",
+    "AC Units",
     min_value=0.0,
-    value=10.0,
-    step=1.0
+    value=100.0
 )
 
-# Prediction button
+fan_units = st.number_input(
+    "Fan Units",
+    min_value=0.0,
+    value=50.0
+)
+
 if st.button("Predict Electric Bill"):
 
-    # Boundary condition
-    if 10 <= ac_units <= 105:
+    input_data = pd.DataFrame({
+        "AC_Units": [ac_units],
+        "Fan_Units": [fan_units]
+    })
 
-        # Create input DataFrame
-        input_data = pd.DataFrame({
-            "AC_Units": [ac_units]
-        })
+    input_poly = poly.transform(input_data)
 
-        # Transform input into polynomial features
-        input_poly = poly.fit_transform(input_data)
+    prediction = model.predict(input_poly)
 
-        # Make prediction
-        prediction = model.predict(input_poly)
-
-        # Get predicted electric bill
-        electric_bill = prediction[0]
-
-        # Display result
-        st.success(
-            f"Predicted Electric Bill: ₹{electric_bill:.2f}"
-        )
-
-        st.info(
-            f"AC Units Entered: {ac_units}"
-        )
-
-    else:
-        st.error(
-            "Out of range! Please enter AC Units between 10 and 105."
-        )
+    st.success(
+        f"Predicted Electric Bill: ₹{prediction[0]:.2f}"
+    )
