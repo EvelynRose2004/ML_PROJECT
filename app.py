@@ -3,9 +3,11 @@ import streamlit as st
 import pandas as pd
 import joblib
 
+from sklearn.preprocessing import PolynomialFeatures
+
 # Page configuration
 st.set_page_config(
-    page_title="Electric Bill Predictor",
+    page_title="AC Electric Bill Prediction",
     page_icon="⚡",
     layout="centered"
 )
@@ -13,12 +15,13 @@ st.set_page_config(
 # Load the saved model
 model = joblib.load("model.pkl")
 
+# Create PolynomialFeatures
+poly = PolynomialFeatures(degree=2)
+
 # Application title
 st.title("⚡ AC Electric Bill Prediction")
 
-st.write(
-    "Enter the AC Units to predict your electricity bill."
-)
+st.write("Enter the AC Units to predict your electricity bill.")
 
 st.divider()
 
@@ -38,16 +41,20 @@ if st.button("Predict Electric Bill"):
         "AC_Units": [ac_units]
     })
 
-    # Make prediction
-    prediction = model.predict(input_data)
+    # Transform input into polynomial features
+    input_poly = poly.fit_transform(input_data)
 
-    # Display result
+    # Make prediction
+    prediction = model.predict(input_poly)
+
+    # Get predicted electric bill
     electric_bill = prediction[0]
 
+    # Display result
     st.success(
         f"Predicted Electric Bill: ₹{electric_bill:.2f}"
     )
 
     st.info(
-        f"AC Units: {ac_units}"
+        f"AC Units Entered: {ac_units}"
     )
