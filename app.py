@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import joblib
@@ -36,25 +35,33 @@ ac_units = st.number_input(
 # Prediction button
 if st.button("Predict Electric Bill"):
 
-    # Create input DataFrame
-    input_data = pd.DataFrame({
-        "AC_Units": [ac_units]
-    })
+    # Boundary condition
+    if 10 <= ac_units <= 105:
 
-    # Transform input into polynomial features
-    input_poly = poly.fit_transform(input_data)
+        # Create input DataFrame
+        input_data = pd.DataFrame({
+            "AC_Units": [ac_units]
+        })
 
-    # Make prediction
-    prediction = model.predict(input_poly)
+        # Transform input into polynomial features
+        input_poly = poly.fit_transform(input_data)
 
-    # Get predicted electric bill
-    electric_bill = prediction[0]
+        # Make prediction
+        prediction = model.predict(input_poly)
 
-    # Display result
-    st.success(
-        f"Predicted Electric Bill: ₹{electric_bill:.2f}"
-    )
+        # Get predicted electric bill
+        electric_bill = prediction[0]
 
-    st.info(
-        f"AC Units Entered: {ac_units}"
-    )
+        # Display result
+        st.success(
+            f"Predicted Electric Bill: ₹{electric_bill:.2f}"
+        )
+
+        st.info(
+            f"AC Units Entered: {ac_units}"
+        )
+
+    else:
+        st.error(
+            "Out of range! Please enter AC Units between 10 and 105."
+        )
