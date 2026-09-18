@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import joblib
 
-pipeline = joblib.load("model.pkl")
+pipeline = joblib.load("model(2).pkl")
 
 poly = pipeline["poly"]
 model = pipeline["model"]
